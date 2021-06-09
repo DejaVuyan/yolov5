@@ -52,3 +52,25 @@ personResults.crop(personPath)
 imgs = load_images_from_folder(os.path.join(personPath, 'crops/person'))
 results = ppeModel(imgs, size=640)
 print(results.xyxy[0].T[5].tolist())
+
+videoPath = '/home/yyz/code/Yolov5-Deepsort/20210515_152115.mp4'
+vidcap = cv2.VideoCapture(videoPath)
+if vidcap.isOpened():
+    while True:
+        success, frame = vidcap.read()
+        if not success: break  # if in the end of video
+        # funciong: processing image
+        # cv2.imshow('frame',frame)
+        personPath = 'runs'
+        personResults = personModel(frame, size=640)
+        personResults.crop(personPath)
+        imgs = load_images_from_folder(os.path.join(personPath, 'crops/person'))
+        results = ppeModel(imgs, size=640)
+        print(results.xyxy[0].T[5].tolist())
+        #check(results.xyxy[0].T[5].tolist())
+        print('get it ')
+        break
+
+else:
+    print('视频打开失败')
+    exit()

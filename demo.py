@@ -7,6 +7,8 @@ from PIL import Image
 
 # Model
 #第一个参数必须是yolov5的github名字，path是自己的模型名字，force_reload会将.cache中的文件删掉，去下载最新版的yolov5
+from cv2 import CAP_PROP_POS_MSEC
+
 model = torch.hub.load('ultralytics/yolov5', 'custom', path='/home/yyz/code/yolov5/m1.pt')
 #model是一个model/common.py中AutoShape的类
 
@@ -38,14 +40,21 @@ model_person = torch.hub.load('ultralytics/yolov5',
 
 torch.tensor()
 
+#read each frame in the video and print it's time
 import cv2
 videoPath = '/home/yyz/code/Yolov5-Deepsort/20210515_152115.mp4'
 vidcap = cv2.VideoCapture(videoPath)
+fps = vidcap.get(cv2.CAP_PROP_FPS)  #CAP_PROP_后接各种属性
+count = 0
 if vidcap.isOpened():
-    while True:
-        success, image = vidcap.read()
-        if not success:break   #if in the end of video
-        # funciong: processing image
+    success, frame = vidcap.read()
+    while success:
+        count = count + 1
+        print(f'count={count} time={count*(1/fps)}')
+        success, frame = vidcap.read()  #read a new farme
 
-    else:
-        print('视频打开失败')
+    print('end of video')
+else:
+    print('视频打开失败')
+    exit()
+print('hello world')
