@@ -3,6 +3,8 @@
 import math
 from copy import copy
 from pathlib import Path
+import cv2
+import os
 
 import numpy as np
 import pandas as pd
@@ -16,6 +18,7 @@ from utils.datasets import letterbox
 from utils.general import non_max_suppression, make_divisible, scale_coords, increment_path, xyxy2xywh, save_one_box
 from utils.plots import colors, plot_one_box
 from utils.torch_utils import time_synchronized
+
 
 
 def autopad(k, p=None):  # kernel, padding
@@ -313,18 +316,19 @@ class Detections:
         self.t = tuple((times[i + 1] - times[i]) * 1000 / self.n for i in range(3))  # timestamps (ms)
         self.s = shape  # inference BCHW shape
 
-    def display(self, pprint=False, show=False, save=False, crop=False, render=False, save_dir=Path('')):
-        for i, (im, pred) in enumerate(zip(self.imgs, self.pred)):
+    def display(self, pprint=False, show=False, save=False, crop=False, render=False, save_dir=Path(''),ppe = False,out_name=''):
+
+        for i, (im, pred) in enumerate(zip(self.imgs, self.pred)):  #process each image and pred
             str = f'image {i + 1}/{len(self.pred)}: {im.shape[0]}x{im.shape[1]} '
             if pred is not None:
                 for c in pred[:, -1].unique():
                     n = (pred[:, -1] == c).sum()  # detections per class
                     str += f"{n} {self.names[int(c)]}{'s' * (n > 1)}, "  # add to string
-                if show or save or render or crop:
+                if show or save or render or crop or ppe:
                     for *box, conf, cls in pred:  # xyxy, confidence, class
                         label = f'{self.names[int(cls)]} {conf:.2f}'
                         if crop:
-                            save_one_box(box, im, file=save_dir / 'crops' / self.names[int(cls)] / self.files[i])
+                            save_one_box(box, im, file='runs/crops' / save_dir / self.names[int(cls)] / self.files[i])
                         else:  # all others
                             plot_one_box(box, im, label=label, color=colors(cls))
 
@@ -339,6 +343,28 @@ class Detections:
                 print(f"{'Saved' * (i == 0)} {f}", end=',' if i < self.n - 1 else f' to {save_dir}\n')
             if render:
                 self.imgs[i] = np.asarray(im)
+            if ppe:
+                helmentNumber = 0
+                workingcloNumber = 0
+                for *box, conf, cls in pred:  # xyxy, confidence, class
+                    if (cls.item() == 0 ):
+                        helmentNumber+=1
+                    if (cls.item() == 1):
+                        workingcloNumber+=1
+                    label = f'{self.names[int(cls)]} {conf:.2f}'
+                    print(label)
+                if ((helmentNumber<1) or (workingcloNumber<1)):
+                    print('no wear safty gear')
+                    p = 'runs/output'
+                    out_img_name = out_name + self.files[i]
+                    im.save(p / save_dir / out_img_name)  # save
+                else:
+                    print(
+                        f'imgName={self.files[i]}, '
+                        f'helmentNumber={helmentNumber},'
+                        f'workingcloNumber={workingcloNumber}')
+
+
 
     def print(self):
         self.display(pprint=True)  # print results

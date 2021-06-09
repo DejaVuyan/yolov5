@@ -40,8 +40,9 @@ model_person = torch.hub.load('ultralytics/yolov5',
 
 torch.tensor()
 
-#read each frame in the video and print it's time
+#read and save each frame in the video, path is it's time
 import cv2
+import os
 videoPath = '/home/yyz/code/Yolov5-Deepsort/20210515_152115.mp4'
 vidcap = cv2.VideoCapture(videoPath)
 fps = vidcap.get(cv2.CAP_PROP_FPS)  #CAP_PROP_后接各种属性
@@ -50,11 +51,37 @@ if vidcap.isOpened():
     success, frame = vidcap.read()
     while success:
         count = count + 1
-        print(f'count={count} time={count*(1/fps)}')
+        times = count*(1/fps)
+        print(f'count={count} time={times}')
+        #can weite a function to pass count and fps and out the minites and seconds
+        path = str(times)
         success, frame = vidcap.read()  #read a new farme
+        personResults = personModel(frame, size=640)
+        personResults.crop(path)
 
     print('end of video')
 else:
     print('视频打开失败')
     exit()
 print('hello world')
+
+# detect ppe in a dir
+from models import common   # models is a dir and common.py
+import os
+import cv2
+def load_images_from_folder(folder):
+    images = []
+    for filename in os.listdir(folder):
+        img = cv2.imread(os.path.join(folder, filename))
+        if img is not None:
+            images.append(img)
+    return images
+
+import torch
+ppeModel = torch.hub.load('/home/yyz/code/yolov5',
+                          'custom',
+                          path='/home/yyz/code/yolov5/m1.pt',
+                          source='local')
+testpath = load_images_from_folder('/home/yyz/code/yolov5/runs/crops/0.10664639055371679/person/')
+results = ppeModel(testpath, size=640)
+results.display(ppe=True)
