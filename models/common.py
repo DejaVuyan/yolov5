@@ -355,7 +355,7 @@ class Detections:
                     print(label)
                 if ((helmentNumber<1) or (workingcloNumber<1)):
                     print('no wear safty gear')
-                    p = 'runs/output'
+                    p = 'runs/output2'
                     out_img_name = out_name + self.files[i]
                     im.save(p / save_dir / out_img_name)  # save
                 else:

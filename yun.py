@@ -18,7 +18,7 @@ ppeModel = torch.hub.load('/home/yyz/code/yolov5',
 def load_images_from_folder(folder):
     images = []
     for filename in os.listdir(folder):
-        img = cv2.imread(os.path.join(folder, filename))
+        img = cv2.imread(os.path.join(folder, filename))[:, :, ::-1]
         if img is not None:
             images.append(img)
     return images
@@ -60,6 +60,7 @@ def load_images_from_folder(folder):
 # import os
 from models import common   # models is a dir and common.py
 
+videoPath1 = '/run/sdd/Yun/2021/CV/10Ges/作业视频/20210515_163609.mp4'
 videoPath = '/home/yyz/code/Yolov5-Deepsort/20210515_152115.mp4'
 vidcap = cv2.VideoCapture(videoPath)
 fps = vidcap.get(cv2.CAP_PROP_FPS)  # CAP_PROP_后接各种属性
@@ -74,10 +75,10 @@ if vidcap.isOpened():
         # can weite a function to pass count and fps and out the minites and seconds
         path = str(times)
         success, frame = vidcap.read()  # read a new farme
-        personResults = personModel(frame, size=640)
+        personResults = personModel(frame[:, :, ::-1], size=640)  #cv is BGR, yolo is RGB
         personResults.crop(path)
         cropped_imgs = load_images_from_folder('runs/crops/'+path+'/person')
-        results = ppeModel(cropped_imgs, size=640)
+        results = ppeModel(cropped_imgs, size=160)
         results.display(ppe=True,out_name=path)
         #results = ppeModel(imgs, size=640)
     print('end of video')
