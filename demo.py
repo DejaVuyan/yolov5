@@ -85,3 +85,45 @@ ppeModel = torch.hub.load('/home/yyz/code/yolov5',
 testpath = load_images_from_folder('/home/yyz/code/yolov5/runs/crops/0.10664639055371679/person/')
 results = ppeModel(testpath, size=640)
 results.display(ppe=True)
+
+
+
+###########################################
+#检测出有人的部分，通过检测Tensor是否为0来判断
+# load model
+import torch
+import cv2
+from PIL import Image
+import os
+
+personModel = torch.hub.load('D:\MyWrokspace\code\others\yolov5',
+                             'custom',
+                             path='D:\MyWrokspace\code\others\yolov5\weights\yolov5s.pt',
+                             source='local')
+personModel.classes = [0]   #filter by classes, only predict person.
+
+save_path = r'E:\dataset\test'
+video_path = r'E:\dataset\Yundian\10Ges\作业视频\安全装备\20210515_161247.mp4'
+
+vidcap = cv2.VideoCapture(video_path)
+
+
+fps = vidcap.get(cv2.CAP_PROP_FPS)  # CAP_PROP_后接各种属性
+w = int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH))
+h = int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+vid_writer = cv2.VideoWriter(save_path+'\\test2.mp4', cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
+img1 = cv2.imread(r'1.png')[:, :, ::-1]
+img2 = cv2.imread(r'7576.jpg')[:, :, ::-1]
+personResults1 = personModel(img1, size=640)
+personResults2 = personModel(img2, size=640)
+
+print(personResults1.pred)
+print(personResults2.pred)
+
+if len(personResults2.pred[0]) == 0:
+	print("this tensor is empty")
+else:
+	print("this tensor is not empty")
+
+
+

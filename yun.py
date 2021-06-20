@@ -3,6 +3,8 @@ import cv2
 from PIL import Image
 import os
 
+from utils.general import increment_path
+
 # load model
 personModel = torch.hub.load('/home/yyz/code/yolov5',
                              'custom',
@@ -64,23 +66,24 @@ videoPath1 = '/run/sdd/Yun/2021/CV/10Ges/作业视频/20210515_163609.mp4'
 videoPath = '/home/yyz/code/Yolov5-Deepsort/20210515_152115.mp4'
 vidcap = cv2.VideoCapture(videoPath)
 fps = vidcap.get(cv2.CAP_PROP_FPS)  # CAP_PROP_后接各种属性
+print(fps)
 count = 0
 a = 0
 if vidcap.isOpened():
-    success, frame = vidcap.read()
+    success, frame = vidcap.read()   # read the first frame
     while success:
         count = count + 1
         times = count * (1 / fps)
-        #print(f'count={count} time={times}')
-        # can weite a function to pass count and fps and out the minites and seconds
+        # print(f'count={count} time={times}')
+        # can write a function to pass count and fps and out the minites and seconds
         path = str(times)
-        success, frame = vidcap.read()  # read a new farme
         personResults = personModel(frame[:, :, ::-1], size=640)  #cv is BGR, yolo is RGB
         personResults.crop(path)
         cropped_imgs = load_images_from_folder('runs/crops/'+path+'/person')
         results = ppeModel(cropped_imgs, size=160)
         results.display(ppe=True,out_name=path)
-        #results = ppeModel(imgs, size=640)
+        success, frame = vidcap.read()  # read a new frame
+        # results = ppeModel(imgs, size=640)
     print('end of video')
 else:
     print('视频打开失败')
