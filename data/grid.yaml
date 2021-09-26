@@ -1,0 +1,14 @@
+# train and val data as 1) directory: path/images/, 2) file: path/images.txt, or 3) list: [path1/images/, path2/images/]
+train: ../../BD44319_yolov5/train/images   #584 images
+val: ../../BD44319_yolov5/test/images  # 145
+
+# number of classes
+nc: 17
+
+# class names
+names: [ 'bj_bpmh', 'bj_bpps', 'bj_wkps', 'jyz_pl', 'sly_dmyw',
+        'hxq_gjtps', 'xmbhyc', 'yw_gkxfw', 'yw_nc', 'gbps',
+        'wcaqm', 'wcgz', 'xy', 'bjdsyc', 'ywzt_yfyc', 'hxq_gjbs',
+        'kgg_ybh'
+        ]
+
